@@ -25,6 +25,8 @@ Purchases need a development or App Store build (`npx expo run:ios` on a Mac, or
 
 Use the company Apple Developer account, not a personal one. Bundle id: `com.oceanink.depositproof`.
 
+`eas.json` submits with the App Store Connect admin `hannahzhang131@gmail.com`. The account holder `recipeconnects@oceanink.co` is the one who accepts Apple agreements. Production builds are store builds: `npx eas-cli build -p ios --profile production --auto-submit`.
+
 In App Store Connect create a Non-Consumable named Lifetime with product id `lifetime`. Leave China mainland off. Host `legal/privacy.html` and paste that URL into the listing. The in-app privacy screen uses the same text.
 
 Strip Meta is the next app. It is not in this project yet.
