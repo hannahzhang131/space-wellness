@@ -8,9 +8,9 @@ ROOT = Path(__file__).resolve().parents[1] / "assets" / "images"
 BLACK = (0, 0, 0, 255)
 WHITE = (255, 255, 255, 255)
 LINES = ("Rent", "Proof")
-FONT = Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf")
+FONT = Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf")
 if not FONT.exists():
-    FONT = Path("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf")
+    FONT = Path("/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf")
 
 
 def load_font(size: int) -> ImageFont.FreeTypeFont:
