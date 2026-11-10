@@ -29,6 +29,6 @@ export const privacySections = [
   },
   {
     title: 'Contact',
-    body: 'Write to Oceanink through the App Store listing for RentProof. This notice was last updated on 10 November 2026.',
+    body: 'Email recipeconnects@oceanink.co. This notice was last updated on 10 November 2026.',
   },
 ] as const;
