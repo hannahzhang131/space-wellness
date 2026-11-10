@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Deposit Proof",
+    "name": "RentProof",
     "slug": "deposit-proof",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -47,15 +47,15 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Deposit Proof adds room photos you already took. Photos stay on this phone.",
-          "cameraPermission": "Deposit Proof uses the camera to photograph each room for your condition report. Photos stay on this phone.",
+          "photosPermission": "RentProof adds room photos you already took. Photos stay on this phone.",
+          "cameraPermission": "RentProof uses the camera to photograph each room for your condition report. Photos stay on this phone.",
           "microphonePermission": false
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Deposit Proof uses your location when you add a photo, so the report can show the street address. Photos stay on this phone.",
+          "locationWhenInUsePermission": "RentProof uses your location when you add a photo, so the report can show the street address. Photos stay on this phone.",
           "locationAlwaysAndWhenInUsePermission": false,
           "locationAlwaysPermission": false,
           "motionUsagePermission": false,

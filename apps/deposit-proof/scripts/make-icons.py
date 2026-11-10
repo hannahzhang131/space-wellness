@@ -1,4 +1,4 @@
-"""Draw the Deposit Proof icon set. Re-run from apps/deposit-proof."""
+"""Draw the RentProof icon set. Re-run from apps/deposit-proof."""
 
 from pathlib import Path
 
@@ -26,7 +26,7 @@ def draw_mark(size: int, ink: tuple[int, int, int, int], background: tuple[int, 
     gap = ring * 3
     inner = [box[0] + gap, box[1] + gap, box[2] - gap, box[3] - gap]
     draw.ellipse(inner, outline=ink, width=max(2, ring // 2))
-    draw.text((size / 2, size / 2 - size * 0.02), "DP", font=font(int(size * 0.28)), fill=ink, anchor="mm")
+    draw.text((size / 2, size / 2 - size * 0.02), "RP", font=font(int(size * 0.28)), fill=ink, anchor="mm")
     return image
 
 

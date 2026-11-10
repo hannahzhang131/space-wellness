@@ -37,10 +37,10 @@ export function EntitlementProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const actions = useRef<PurchaseActions>({
     buy: async () => {
-      throw new Error('Lifetime is sold in the App Store build of Deposit Proof.');
+      throw new Error('Lifetime is sold in the App Store build of RentProof.');
     },
     restore: async () => {
-      throw new Error('Restore works in the App Store build of Deposit Proof.');
+      throw new Error('Restore works in the App Store build of RentProof.');
     },
   });
 

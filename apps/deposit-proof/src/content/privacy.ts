@@ -1,11 +1,11 @@
 export const privacySections = [
   {
     title: 'Who we are',
-    body: 'Deposit Proof is published by Oceanink Ltd, 124 City Road, London, United Kingdom, EC1V 2NX. Company number 16684370.',
+    body: 'RentProof is published by Oceanink Ltd, 124 City Road, London, United Kingdom, EC1V 2NX. Company number 16684370.',
   },
   {
     title: 'Photos and reports',
-    body: 'Room photos, notes, and the PDF report stay on your device. Deposit Proof does not upload them and does not have an account. If you share or print a PDF, that file is then handled by the app you chose.',
+    body: 'Room photos, notes, and the PDF report stay on your device. RentProof does not upload them and does not have an account. If you share or print a PDF, that file is then handled by the app you chose.',
   },
   {
     title: 'Location',
@@ -17,11 +17,11 @@ export const privacySections = [
   },
   {
     title: 'What we do not do',
-    body: 'Deposit Proof has no ads, no third-party analytics, and no tracking across other companies’ apps.',
+    body: 'RentProof has no ads, no third-party analytics, and no tracking across other companies’ apps.',
   },
   {
     title: 'Children',
-    body: 'Deposit Proof is a household record. It is not directed at children under 13.',
+    body: 'RentProof is a household record. It is not directed at children under 13.',
   },
   {
     title: 'Not legal advice',
@@ -29,6 +29,6 @@ export const privacySections = [
   },
   {
     title: 'Contact',
-    body: 'Write to Oceanink through the App Store listing for Deposit Proof. This notice was last updated on 10 November 2026.',
+    body: 'Write to Oceanink through the App Store listing for RentProof. This notice was last updated on 10 November 2026.',
   },
 ] as const;

@@ -16,7 +16,9 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "hannahzhang131@gmail.com"
+        "appleId": "recipeconnects@oceanink.co",
+        "appleTeamId": "83K95JM2U2",
+        "appName": "RentProof"
       }
     }
   }

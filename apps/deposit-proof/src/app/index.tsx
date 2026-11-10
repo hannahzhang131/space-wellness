@@ -17,10 +17,10 @@ export default function HomeScreen() {
       <View style={styles.mast}>
         <View style={styles.mastCopy}>
           <Text style={styles.brand}>OCEANINK LTD</Text>
-          <Display>Deposit Proof</Display>
+          <Display>RentProof</Display>
           <Body muted>Photograph each room when you move in, and again when you leave. The PDF stays on this phone.</Body>
         </View>
-        <Stamp label="DP" />
+        <Stamp label="RP" />
       </View>
       <View style={styles.row}>
         <Pressable accessibilityRole="button" onPress={() => router.push('/settings')}>

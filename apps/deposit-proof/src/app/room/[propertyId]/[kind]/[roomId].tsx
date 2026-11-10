@@ -49,7 +49,7 @@ export default function RoomScreen() {
       if (source === 'camera') {
         const permission = await ImagePicker.requestCameraPermissionsAsync();
         if (!permission.granted) {
-          setError('The camera is off for Deposit Proof. You can still add a photo from your library.');
+          setError('The camera is off for RentProof. You can still add a photo from your library.');
           return;
         }
       }

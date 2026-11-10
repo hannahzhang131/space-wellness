@@ -90,7 +90,7 @@ export function buildReportHtml(document: ReportDocument, compare: boolean): str
 <body>
   ${watermark}
   <header>
-    <p class="brand">OCEANINK LTD · DEPOSIT PROOF</p>
+    <p class="brand">OCEANINK LTD · RENTPROOF</p>
     <h1>${escapeHtml(document.propertyName)}</h1>
     <p class="address">${escapeHtml(document.propertyAddress)}</p>
     <p class="meta">${escapeHtml(document.title)} · ${escapeHtml(document.generatedLabel)}</p>

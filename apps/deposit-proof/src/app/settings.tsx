@@ -20,7 +20,7 @@ export default function SettingsScreen() {
       <Text style={styles.block}>Oceanink Ltd</Text>
       <Text style={styles.meta}>124 City Road, London EC1V 2NX</Text>
       <Text style={styles.meta}>Company number 16684370</Text>
-      <Text style={styles.meta}>Deposit Proof 1.0.0</Text>
+      <Text style={styles.meta}>RentProof 1.0.0</Text>
       <Text style={styles.meta}>One-time purchase. No subscription. No account.</Text>
     </Screen>
   );

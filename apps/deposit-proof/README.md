@@ -1,4 +1,4 @@
-# Deposit Proof
+# RentProof
 
 A local move-in and move-out record for Oceanink Ltd. Photos and the PDF stay on the phone. There is no account and no China store listing in this version.
 
@@ -25,7 +25,7 @@ Purchases need a development or App Store build (`npx expo run:ios` on a Mac, or
 
 Use the company Apple Developer account, not a personal one. Bundle id: `com.oceanink.depositproof`.
 
-`eas.json` submits with the App Store Connect admin `hannahzhang131@gmail.com`. The account holder `recipeconnects@oceanink.co` is the one who accepts Apple agreements. Production builds are store builds: `npx eas-cli build -p ios --profile production --auto-submit`.
+The App Store name is RentProof. `eas.json` submits with the account holder `recipeconnects@oceanink.co` on team OceanInk ltd (`83K95JM2U2`). The App Store Connect admin `hannahzhang131@gmail.com` can also open the listing. Production builds are store builds: `npx eas-cli build -p ios --profile production`.
 
 In App Store Connect create a Non-Consumable named Lifetime with product id `lifetime`. Leave China mainland off. Host `legal/privacy.html` and paste that URL into the listing. The in-app privacy screen uses the same text.
 
