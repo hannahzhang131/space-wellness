@@ -26,4 +26,12 @@ The camera, Face ID and reminders need a development or App Store build. The web
 
 iPhone only (`supportsTablet: false`), so App Store Connect does not ask for iPad screenshots. Bundle id `com.oceanink.progresspics`. Production builds use the `production` profile in `eas.json` with the `progress-pics` EAS environment.
 
-In App Store Connect create a Non-Consumable named Lifetime with product id `progresspics.lifetime` and attach it to the first version. Leave China mainland off. Host `legal/privacy.html` and use that URL for the privacy policy and support URL.
+In App Store Connect create a Non-Consumable named Lifetime with product id `progresspics.lifetime` and attach it to the first version. Leave China mainland off.
+
+Static pages for App Store URLs live in `legal/` and in repo `docs/progress-pics/`. After GitHub Pages is on (`main`, folder `/docs`), use:
+
+- Privacy: `https://hannahzhang131.github.io/space-wellness/progress-pics/privacy.html`
+- Support: `https://hannahzhang131.github.io/space-wellness/progress-pics/support.html`
+- Marketing (optional): `https://hannahzhang131.github.io/space-wellness/progress-pics/`
+
+See `docs/README.md` for one-time Pages setup.
