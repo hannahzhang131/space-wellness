@@ -1,4 +1,20 @@
-import { cleanUrl } from './lib/clean-url.js';
+function cleanUrl(raw) {
+  const tracking = new Set([
+    'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id',
+    'utm_source_platform', 'utm_creative_format', 'utm_marketing_tactic',
+    'fbclid', 'gclid', 'gbraid', 'wbraid', 'msclkid', 'mc_cid', 'mc_eid', 'igshid',
+    'si', 'ref', 'ref_src', 'ref_url',
+  ]);
+  const url = new URL(raw);
+  const toDelete = [];
+  for (const key of url.searchParams.keys()) {
+    const lower = key.toLowerCase();
+    if (tracking.has(lower) || lower.startsWith('utm_')) toDelete.push(key);
+  }
+  for (const key of toDelete) url.searchParams.delete(key);
+  url.hash = '';
+  return url.toString();
+}
 
 const statusEl = document.getElementById('status');
 const cleanBtn = document.getElementById('clean');
@@ -21,7 +37,7 @@ async function copyText(tabId, text) {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    /* Chrome popup clipboard is flaky; copy from the page instead. */
+    // Popup clipboard is unreliable; copy from the page.
   }
   const [{ result }] = await chrome.scripting.executeScript({
     target: { tabId },
@@ -49,9 +65,10 @@ cleanBtn.addEventListener('click', async () => {
     const cleaned = cleanUrl(tab.url);
     const copied = await copyText(tab.id, cleaned);
     if (!copied) {
-      throw new Error('Clipboard blocked. Select the text below and copy manually.');
+      setStatus('Copy this:\n' + cleaned);
+      return;
     }
-    setStatus(`Copied clean link:\n${cleaned}`);
+    setStatus('Copied clean link:\n' + cleaned);
   } catch (error) {
     setStatus(error instanceof Error ? error.message : 'Could not clean link.');
   }
@@ -68,17 +85,8 @@ printBtn.addEventListener('click', async () => {
         if (!document.getElementById(id)) {
           const style = document.createElement('style');
           style.id = id;
-          style.textContent = `
-            @media print {
-              nav, header, footer, aside, [role="navigation"], [role="banner"], [role="contentinfo"],
-              .ad, .ads, [class*="advert"], [id*="advert"], [class*="newsletter"], [class*="popup"] {
-                display: none !important;
-              }
-              article, main, body { max-width: 100% !important; }
-              body { font-size: 12pt !important; line-height: 1.5 !important; color: #000 !important; }
-              img { max-width: 100% !important; page-break-inside: avoid; }
-            }
-          `;
+          style.textContent =
+            '@media print{nav,header,footer,aside,[role=navigation],[role=banner],[role=contentinfo],.ad,.ads{display:none!important}body{font-size:12pt!important;line-height:1.5!important}}';
           document.head.appendChild(style);
         }
         window.print();
