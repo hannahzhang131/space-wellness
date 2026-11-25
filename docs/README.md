@@ -25,3 +25,13 @@ Source copies also live in `apps/progress-photos/legal/`.
 | Privacy Policy URL | `https://hannahzhang131.github.io/space-wellness/rentproof/privacy.html` |
 | Support URL | `https://hannahzhang131.github.io/space-wellness/rentproof/support.html` |
 | Marketing URL (optional) | `https://hannahzhang131.github.io/space-wellness/rentproof/` |
+
+## AI Text Hint (Chrome extension)
+
+| Field | URL |
+|-------|-----|
+| Privacy Policy URL | `https://hannahzhang131.github.io/space-wellness/ai-text-hint/privacy.html` |
+| Support URL | `https://hannahzhang131.github.io/space-wellness/ai-text-hint/support.html` |
+| Marketing URL (optional) | `https://hannahzhang131.github.io/space-wellness/ai-text-hint/` |
+
+Source: `extensions/ai-text-hint/PRIVACY.md` and `docs/ai-text-hint/`.
