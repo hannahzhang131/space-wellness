@@ -26,7 +26,7 @@ Source copies also live in `apps/progress-photos/legal/`.
 | Support URL | `https://hannahzhang131.github.io/space-wellness/rentproof/support.html` |
 | Marketing URL (optional) | `https://hannahzhang131.github.io/space-wellness/rentproof/` |
 
-## AI Text Hint (Chrome extension)
+## AI Pattern & Slop Checker (Chrome extension)
 
 | Field | URL |
 |-------|-----|

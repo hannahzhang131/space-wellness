@@ -1,4 +1,4 @@
-# AI Text Hint — light side hustle
+# AI Pattern & Slop Checker — light side hustle
 
 Positioning: **faster than ZeroGPT for “is this paragraph template-y?”** while you browse—not a lab-grade detector. That’s honest and enough for a small product.
 

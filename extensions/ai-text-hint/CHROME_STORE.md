@@ -1,4 +1,4 @@
-# Chrome Web Store — AI Text Hint
+# Chrome Web Store — AI Pattern & Slop Checker (Local & Private)
 
 Account: **hannahzhang131@gmail.com** ($5 developer registration — same as Recipe toolkit).
 
@@ -26,7 +26,7 @@ Support URL:
 
 ```bash
 cd /path/to/space-wellness/extensions/ai-text-hint
-zip -r ../ai-text-hint-v0.1.2.zip . \
+zip -r ../ai-pattern-slop-checker-v0.1.3.zip . \
   -x "*.DS_Store" -x "CHROME_STORE.md" -x "MONETIZATION.md"
 ```
 
@@ -53,17 +53,17 @@ Optional: put files in `extensions/ai-text-hint/store-assets/` (not in zip).
 
 ## 4. Dashboard copy (paste)
 
-**Title:** AI Text Hint — Text Pattern Check
+**Title:** AI Pattern & Slop Checker (Local & Private)
 
 **Short description (132 chars):**  
-Spot templated writing patterns on any page text—in one click. On-device, no account, no sending text to our servers.
+Catch templated “slop” patterns in page text—one click. 100% on-device. No account. Your text never leaves the browser.
 
 **Detailed description:**
 
 ```
 Read long posts, Reddit threads, or articles without opening another tab.
 
-AI Text Hint scores text you’re already viewing:
+AI Pattern & Slop Checker scores text you’re already viewing:
 • Analyze page article (blog / news body)
 • Analyze selection (best for forums—highlight one comment first)
 
@@ -99,9 +99,9 @@ Do **not** claim “AI detection” or “% AI” in the listing.
 ## 6. Submit
 
 1. https://chrome.google.com/webstore/devconsole  
-2. **New item** → upload `ai-text-hint-v0.1.2.zip`  
+2. **New item** → upload `ai-pattern-slop-checker-v0.1.3.zip`  
 3. Fill store listing, privacy URL, icon, screenshot  
-4. **Submit for review** (often 1–7 days for new items; `<all_urls>` removed in v0.1.2 to ease review)
+4. **Submit for review** (often 1–7 days for new items; v0.1.3 uses activeTab only, no broad host access)
 
 After approval, save the public store URL for Gumroad / site links.
 
@@ -109,4 +109,4 @@ After approval, save the public store URL for Gumroad / site links.
 
 ## 7. Side hustle (see MONETIZATION.md)
 
-Keep v0.1.2 **free** on the store for installs. Monetize lightly outside the store (tips or a small Pro pack)—details in `MONETIZATION.md`.
+Keep v0.1.3 **free** on the store for installs. Monetize lightly outside the store (tips or a small Pro pack)—details in `MONETIZATION.md`.

@@ -8,9 +8,18 @@ body {
   background: #f5f3ee;
 }
 
-h1 {
-  margin: 0 0 4px;
-  font-size: 16px;
+h1.title {
+  margin: 0 0 2px;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.subtitle {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #3d5a80;
+  letter-spacing: 0.02em;
 }
 
 .fine {

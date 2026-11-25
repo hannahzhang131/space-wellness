@@ -1,4 +1,4 @@
-# AI Text Hint (Chrome MV3)
+# AI Pattern & Slop Checker (Local & Private) — Chrome MV3
 
 Analyzes **text on web pages** only. Uses on-device pattern signals (phrases, sentence uniformity). **Not** a certified AI detector.
 

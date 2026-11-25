@@ -1,11 +1,11 @@
-# Privacy — AI Text Hint
+# Privacy — AI Pattern & Slop Checker (Local & Private)
 
 **Publisher:** Oceanink Ltd  
 **Contact:** recipeconnects@oceanink.co
 
 ## Summary
 
-AI Text Hint does not collect, store, or sell personal data. There is no account and no analytics SDK.
+AI Pattern & Slop Checker does not collect, store, or sell personal data. There is no account and no analytics SDK.
 
 ## What happens when you click Analyze
 
