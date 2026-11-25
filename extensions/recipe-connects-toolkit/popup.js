@@ -22,18 +22,7 @@ cleanBtn.addEventListener('click', async () => {
     const tab = await activeTab();
     const cleaned = cleanUrl(tab.url);
     await navigator.clipboard.writeText(cleaned);
-    try {
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: (url) => {
-          window.history.replaceState({}, '', url);
-        },
-        args: [cleaned],
-      });
-      setStatus('Clean link copied. Address bar updated.');
-    } catch {
-      setStatus('Clean link copied. (This site blocked address bar update.)');
-    }
+    setStatus('Clean link copied.');
   } catch (error) {
     setStatus(error instanceof Error ? error.message : 'Could not clean link.');
   }
