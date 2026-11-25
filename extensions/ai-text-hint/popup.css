@@ -1,5 +1,5 @@
 body {
-  width: 320px;
+  width: 340px;
   margin: 0;
   padding: 14px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -8,6 +8,8 @@ body {
   background: #f5f3ee;
 }
 
+header { margin-bottom: 10px; }
+
 h1.title {
   margin: 0 0 2px;
   font-size: 14px;
@@ -15,19 +17,31 @@ h1.title {
 }
 
 .subtitle {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 11px;
   font-weight: 600;
   color: #3d5a80;
-  letter-spacing: 0.02em;
 }
 
-.fine {
-  margin: 0 0 12px;
-  color: #555;
+.tagline {
+  margin: 6px 0 0;
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.35;
+  color: #333;
 }
+
+.pro-badge {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: #1a6b3c;
+  border-radius: 4px;
+}
+
+.hidden { display: none !important; }
 
 button {
   display: block;
@@ -40,26 +54,114 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .primary {
   background: #3d5a80;
   color: #fff;
   border-color: #2f4763;
 }
 
-.secondary {
-  background: #fff;
-}
+.secondary { background: #fff; }
 
-.out {
-  margin: 10px 0 0;
+.results {
+  margin-top: 4px;
   padding: 10px;
-  min-height: 80px;
-  max-height: 280px;
-  overflow: auto;
-  font-size: 11px;
-  line-height: 1.45;
-  white-space: pre-wrap;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+.score {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.rhythm {
+  margin: 8px 0 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #2f4763;
+}
+
+.run-hint {
+  margin: 0 0 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  background: #fff8e6;
+  border-radius: 6px;
+  border: 1px solid #f0d78c;
+}
+
+.stats {
+  margin: 6px 0;
+  font-size: 11px;
+  color: #555;
+}
+
+.matches {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.matches h3 {
+  margin: 8px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #666;
+}
+
+.matches ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.pro-cta {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #7a4b00;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.actions button {
+  flex: 1;
+  margin: 0;
+  font-size: 11px;
+  padding: 7px 8px;
+}
+
+.status {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #555;
+  min-height: 1em;
+}
+
+footer {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+}
+
+footer a {
+  font-size: 11px;
+  color: #3d5a80;
+}
+
+.disclaimer {
+  margin: 6px 0 0;
+  font-size: 9px;
+  line-height: 1.35;
+  color: #777;
 }

@@ -7,12 +7,38 @@
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-  <h1 class="title">AI Pattern &amp; Slop Checker</h1>
-  <p class="subtitle">Local &amp; Private</p>
-  <p class="fine">Template-pattern hints only — low score ≠ human, high score ≠ AI.</p>
+  <header>
+    <h1 class="title">AI Pattern &amp; Slop Checker</h1>
+    <p class="subtitle">Local &amp; Private · EN + 中文 patterns</p>
+    <p class="tagline">Spot slop clichés &amp; robotic rhythm before you publish — text never uploads.</p>
+  </header>
+
+  <p id="pro-badge" class="pro-badge hidden">Pro</p>
+
   <button type="button" id="page" class="primary">Analyze page article</button>
   <button type="button" id="selection" class="secondary">Analyze selection</button>
-  <pre id="out" class="out" aria-live="polite"></pre>
+
+  <div id="results" class="results hidden" aria-live="polite">
+    <div id="score" class="score"></div>
+    <p id="rhythm" class="rhythm"></p>
+    <p id="run-hint" class="run-hint hidden"></p>
+    <p class="stats" id="stats"></p>
+    <div id="matches" class="matches"></div>
+    <p id="pro-cta" class="pro-cta hidden"></p>
+    <div class="actions">
+      <button type="button" id="highlight" class="secondary pro-only hidden" disabled>Highlight on page</button>
+      <button type="button" id="copy" class="secondary pro-only hidden" disabled>Copy report</button>
+    </div>
+  </div>
+
+  <p id="status" class="status"></p>
+
+  <footer>
+    <a href="#" id="open-options">Pro license &amp; custom words</a>
+    <p class="disclaimer">Pattern hints only — not proof of AI or human authorship. 仅为文风特征提示。</p>
+  </footer>
+
+  <script src="license.js"></script>
   <script src="analyze.js"></script>
   <script src="popup.js"></script>
 </body>
