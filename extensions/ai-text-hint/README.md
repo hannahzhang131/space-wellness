@@ -4,7 +4,11 @@ Analyzes **text on web pages** only. Uses on-device pattern signals (phrases, se
 
 ## Install
 
-`chrome://extensions` → Developer mode → Load unpacked → this folder.
+After you unzip the GitHub branch, **do not** pick the top folder (e.g. `space-wellness-cursor-ai-text-hint-a3ad`). Chrome needs the folder that **contains `manifest.json` directly**:
+
+`…/space-wellness-…/extensions/ai-text-hint/`
+
+`chrome://extensions` → Developer mode → Load unpacked → select **that** `ai-text-hint` folder.
 
 ## Use
 
