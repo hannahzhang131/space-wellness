@@ -63,6 +63,8 @@ button:active {
   margin: 4px 0 8px;
   font-size: 12px;
   color: #5c6b4f;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 footer {

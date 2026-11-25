@@ -16,13 +16,42 @@ async function activeTab() {
   return tab;
 }
 
+async function copyText(tabId, text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    /* Chrome popup clipboard is flaky; copy from the page instead. */
+  }
+  const [{ result }] = await chrome.scripting.executeScript({
+    target: { tabId },
+    func: (value) => {
+      const field = document.createElement('textarea');
+      field.value = value;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.left = '-1000px';
+      document.body.appendChild(field);
+      field.select();
+      const ok = document.execCommand('copy');
+      field.remove();
+      return ok;
+    },
+    args: [text],
+  });
+  return Boolean(result);
+}
+
 cleanBtn.addEventListener('click', async () => {
   setStatus('');
   try {
     const tab = await activeTab();
     const cleaned = cleanUrl(tab.url);
-    await navigator.clipboard.writeText(cleaned);
-    setStatus('Clean link copied.');
+    const copied = await copyText(tab.id, cleaned);
+    if (!copied) {
+      throw new Error('Clipboard blocked. Select the text below and copy manually.');
+    }
+    setStatus(`Copied clean link:\n${cleaned}`);
   } catch (error) {
     setStatus(error instanceof Error ? error.message : 'Could not clean link.');
   }
