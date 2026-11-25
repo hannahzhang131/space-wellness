@@ -21,15 +21,19 @@ cleanBtn.addEventListener('click', async () => {
   try {
     const tab = await activeTab();
     const cleaned = cleanUrl(tab.url);
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: (url) => {
-        window.history.replaceState({}, '', url);
-      },
-      args: [cleaned],
-    });
     await navigator.clipboard.writeText(cleaned);
-    setStatus('Clean link copied.');
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: (url) => {
+          window.history.replaceState({}, '', url);
+        },
+        args: [cleaned],
+      });
+      setStatus('Clean link copied. Address bar updated.');
+    } catch {
+      setStatus('Clean link copied. (This site blocked address bar update.)');
+    }
   } catch (error) {
     setStatus(error instanceof Error ? error.message : 'Could not clean link.');
   }
