@@ -7,7 +7,7 @@ const rhythmEl = document.getElementById('rhythm');
 const runHintEl = document.getElementById('run-hint');
 const statsEl = document.getElementById('stats');
 const matchesEl = document.getElementById('matches');
-const proCtaEl = document.getElementById('pro-cta');
+const upgradeBtn = document.getElementById('upgrade');
 const statusEl = document.getElementById('status');
 const proBadge = document.getElementById('pro-badge');
 const highlightBtn = document.getElementById('highlight');
@@ -34,7 +34,7 @@ function renderReport(report) {
     runHintEl.classList.add('hidden');
     statsEl.textContent = '';
     matchesEl.innerHTML = '';
-    proCtaEl.classList.add('hidden');
+    upgradeBtn.classList.add('hidden');
     return;
   }
 
@@ -53,8 +53,6 @@ function renderReport(report) {
   const freeLimit = 2;
   const phrases = report.hitPhrases;
   const showPhrases = pro ? phrases : phrases.slice(0, freeLimit);
-  const hiddenCount = pro ? 0 : Math.max(0, phrases.length - freeLimit);
-
   let html = '';
   if (showPhrases.length) {
     html += '<h3>Matched slop phrases</h3><ul>';
@@ -78,14 +76,10 @@ function renderReport(report) {
 
   matchesEl.innerHTML = html;
 
-  if (!pro && (hiddenCount > 0 || report.transitionHits.length > 0)) {
-    proCtaEl.textContent = `Pro: full phrase list (${phrases.length}), transitions, highlight on page, copy report, custom blocklist.`;
-    proCtaEl.classList.remove('hidden');
-  } else if (!pro) {
-    proCtaEl.textContent = 'Pro: highlight hits on the page, copy report, custom blocklist.';
-    proCtaEl.classList.remove('hidden');
+  if (!pro) {
+    upgradeBtn.classList.remove('hidden');
   } else {
-    proCtaEl.classList.add('hidden');
+    upgradeBtn.classList.add('hidden');
   }
 
   highlightBtn.disabled = !pro || buildHighlightTerms(report).length === 0;
@@ -320,6 +314,10 @@ copyBtn.addEventListener('click', async () => {
 document.getElementById('open-options').addEventListener('click', (e) => {
   e.preventDefault();
   chrome.runtime.openOptionsPage();
+});
+upgradeBtn.addEventListener('click', async () => {
+  await openUpgradePage();
+  statusEl.textContent = 'Complete payment in the tab, then reopen this popup.';
 });
 
 void loadContext();

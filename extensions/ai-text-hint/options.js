@@ -1,39 +1,34 @@
-const licenseInput = document.getElementById('license');
-const licenseStatus = document.getElementById('license-status');
 const customArea = document.getElementById('custom');
 const customStatus = document.getElementById('custom-status');
+const paidStatus = document.getElementById('paid-status');
 
 function setStatus(el, msg, ok) {
   el.textContent = msg;
   el.className = ok ? 'status ok' : 'status err';
 }
 
-chrome.storage.local.get(['licenseKey', 'customPhrases', 'proUnlocked'], (data) => {
-  if (data.licenseKey) licenseInput.value = data.licenseKey;
+async function refreshPaid() {
+  const paid = await isProUnlocked();
+  setStatus(
+    paidStatus,
+    paid ? 'Paid features are active on this browser profile.' : 'Free tier — upgrade to unlock all features.',
+    paid,
+  );
+}
+
+chrome.storage.local.get(['customPhrases'], (data) => {
   if (Array.isArray(data.customPhrases)) {
     customArea.value = data.customPhrases.join('\n');
   }
-  if (data.proUnlocked) {
-    setStatus(licenseStatus, 'Pro is active on this browser.', true);
-  }
 });
 
-document.getElementById('save-license').addEventListener('click', () => {
-  const key = licenseInput.value.trim();
-  if (!validateProLicense(key)) {
-    setStatus(licenseStatus, 'Invalid key. Format: SLPC-XXXX-XXXX', false);
-    chrome.storage.local.set({ proUnlocked: false, licenseKey: '' });
-    return;
-  }
-  chrome.storage.local.set({ proUnlocked: true, licenseKey: key }, () => {
-    setStatus(licenseStatus, 'Pro unlocked — reload the popup on any tab.', true);
-  });
-});
+document.getElementById('manage-pay').addEventListener('click', () => void openUpgradePage());
+void refreshPaid();
 
 document.getElementById('save-custom').addEventListener('click', async () => {
   const pro = await isProUnlocked();
   if (!pro) {
-    setStatus(customStatus, 'Custom phrases require Pro.', false);
+    setStatus(customStatus, 'Upgrade first (button above).', false);
     return;
   }
   const lines = customArea.value
