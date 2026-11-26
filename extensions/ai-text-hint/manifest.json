@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Pattern & Slop Checker (Local & Private)",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "On-device pattern & slop hints for page text. Nothing uploaded. Not proof of AI.",
   "icons": {
     "16": "icons/icon-16.png",
