@@ -1,11 +1,14 @@
-/** Google Docs / Office: remember selection before popup steals focus (session only). */
+/**
+ * Docs/Office online often clear selection when the popup opens, or use iframes.
+ * Capture selection per tab (session only, this device).
+ */
 function captureSelection() {
-  const text = (window.getSelection?.()?.toString?.() ?? '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const raw = window.getSelection?.()?.toString?.() ?? '';
+  const text = raw.replace(/\s+/g, ' ').trim();
   if (text.length < 1) return;
   chrome.runtime.sendMessage({ type: 'captureSelection', text });
 }
 
 document.addEventListener('selectionchange', captureSelection);
 document.addEventListener('mouseup', captureSelection);
+document.addEventListener('keyup', captureSelection);
