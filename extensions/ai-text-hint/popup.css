@@ -67,6 +67,32 @@ button:disabled {
 
 .secondary { background: #fff; }
 
+.paste-box {
+  margin: 0 0 8px;
+  font-size: 11px;
+}
+
+.paste-box summary {
+  cursor: pointer;
+  color: #3d5a80;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.paste-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 4px 0 6px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.paste-box .fine { margin: 0 0 6px; }
+
 .results {
   margin-top: 4px;
   padding: 10px;

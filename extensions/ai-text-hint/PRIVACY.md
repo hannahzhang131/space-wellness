@@ -19,7 +19,7 @@ AI Pattern & Slop Checker does not collect, store, or sell personal data. There 
 ## Data storage
 
 - **Pro license** and **custom phrase list** stay in `chrome.storage.local` on this device.
-- On **Google Docs** only, we keep your **last selected text** in `chrome.storage.session` for up to a few minutes so analysis still works after the popup opens (Docs clears selection). Session data is cleared when the browser session ends. It is not sent to us.
+- On **Google Docs / Word / Excel online**, we may keep your **last selected text per tab** in `chrome.storage.session` for a few minutes (iframe editors). Session data ends with the browser session. Not sent to us. **Paste-to-analyze** stays in the popup only.
 
 ## Children
 

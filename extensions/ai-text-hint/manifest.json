@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Pattern & Slop Checker (Local & Private)",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "On-device pattern & slop hints for page text. Nothing uploaded. Not proof of AI.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -13,15 +13,24 @@
     "default_popup": "popup.html"
   },
   "permissions": ["activeTab", "scripting", "storage"],
+  "background": { "service_worker": "background.js" },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": false
   },
   "content_scripts": [
     {
-      "matches": ["https://docs.google.com/*"],
+      "matches": [
+        "https://docs.google.com/*",
+        "https://*.officeapps.live.com/*",
+        "https://*.office.com/*",
+        "https://word.cloud.microsoft/*",
+        "https://excel.cloud.microsoft/*",
+        "https://*.sharepoint.com/*"
+      ],
       "js": ["selection-bridge.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ]
 }

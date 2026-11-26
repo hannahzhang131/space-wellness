@@ -17,6 +17,12 @@
 
   <button type="button" id="page" class="primary">Analyze page article</button>
   <button type="button" id="selection" class="secondary">Analyze selection</button>
+  <details class="paste-box">
+    <summary>Docs / Word / Excel online</summary>
+    <p class="fine">Select text → <strong>Cmd+C</strong> → paste below (most reliable).</p>
+    <textarea id="paste" rows="4" placeholder="Paste paragraph here…"></textarea>
+    <button type="button" id="paste-analyze" class="secondary">Analyze pasted text</button>
+  </details>
 
   <div id="results" class="results hidden" aria-live="polite">
     <div id="score" class="score"></div>

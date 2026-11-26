@@ -111,64 +111,103 @@ function reportPlainText(report) {
   return lines.filter(Boolean).join('\n');
 }
 
+async function sessionSelectionForTab(tabId) {
+  const { slopCapture } = await chrome.storage.session.get('slopCapture');
+  if (!slopCapture || slopCapture.tabId !== tabId) return '';
+  const age = Date.now() - (slopCapture.at || 0);
+  if (age > 300_000) return '';
+  return slopCapture.text || '';
+}
+
+async function extractFromTab(tabId, mode) {
+  const results = await chrome.scripting.executeScript({
+    target: { tabId, allFrames: true },
+    world: 'MAIN',
+    func: (pickMode) => {
+      const clean = (s) => s.replace(/\s+/g, ' ').trim();
+      const pickSelectionText = () =>
+        clean(window.getSelection?.()?.toString?.() ?? '').slice(0, 8000);
+      const pickArticleText = () => {
+        const selectors = [
+          '.kix-appview-editor',
+          '.kix-page-content-wrapper',
+          '.WACViewPanel_EditingElement',
+          '.PageContent',
+          '[data-automation-id="contentEditableRegion"]',
+          '.od-FieldRenderer-text',
+          'article',
+          'main',
+          '[role="textbox"]',
+        ];
+        for (const sel of selectors) {
+          const el = document.querySelector(sel);
+          const t = clean(el?.innerText ?? '');
+          if (t.length > 80) return t.slice(0, 12000);
+        }
+        let best = '';
+        for (const root of [document.body].filter(Boolean)) {
+          const t = clean(root.innerText ?? '');
+          if (t.length > best.length) best = t;
+        }
+        return best.slice(0, 12000);
+      };
+      const text =
+        pickMode === 'selection' ? pickSelectionText() : pickArticleText();
+      return text;
+    },
+    args: [mode],
+  });
+  let best = '';
+  for (const row of results) {
+    const t = row?.result ?? '';
+    if (t.length > best.length) best = t;
+  }
+  return best;
+}
+
+async function analyzeAndShow(text, statusNote) {
+  const customPhrases = await loadContext();
+  lastReport = analyzeText(text, { customPhrases });
+  renderReport(lastReport);
+  statusEl.textContent = statusNote || '';
+}
+
 async function runInPage(mode) {
   statusEl.textContent = 'Reading…';
-  const customPhrases = await loadContext();
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) {
     statusEl.textContent = 'No active tab.';
     return;
   }
-  const [{ result }] = await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    world: 'MAIN',
-    func: (pickMode) => {
-      const pickArticleText = () => {
-        const docEditor = document.querySelector(
-          '.kix-appview-editor, .kix-page-content-wrapper',
-        );
-        if (docEditor) {
-          const t = docEditor.innerText?.replace(/\s+/g, ' ').trim() ?? '';
-          if (t.length > 80) return t.slice(0, 12000);
-        }
-        const roots = [
-          document.querySelector('article'),
-          document.querySelector('main'),
-          document.querySelector('[role="article"]'),
-          document.querySelector('[role="textbox"]'),
-          document.body,
-        ].filter(Boolean);
-        let best = '';
-        for (const root of roots) {
-          const text = root.innerText?.replace(/\s+/g, ' ').trim() ?? '';
-          if (text.length > best.length) best = text;
-        }
-        return best.slice(0, 12000);
-      };
-      const pickSelectionText = () => {
-        const sel = window.getSelection()?.toString() ?? '';
-        return sel.replace(/\s+/g, ' ').trim().slice(0, 8000);
-      };
-      return pickMode === 'selection' ? pickSelectionText() : pickArticleText();
-    },
-    args: [mode],
-  });
-  let text = result ?? '';
+  let text = await extractFromTab(tab.id, mode);
+  let note = '';
   if (mode === 'selection' && text.length < 80) {
-    const session = await chrome.storage.session.get([
-      'slopLastSelection',
-      'slopLastSelectionAt',
-    ]);
-    const age = Date.now() - (session.slopLastSelectionAt || 0);
-    if (age < 180_000 && (session.slopLastSelection?.length ?? 0) >= 80) {
-      text = session.slopLastSelection;
-      statusEl.textContent =
-        'Used your last selection (Docs keeps selection when popup opens). / 使用了刚才在文档里的选中文字。';
+    const cached = await sessionSelectionForTab(tab.id);
+    if (cached.length >= 80) {
+      text = cached;
+      note =
+        'Used saved selection for this tab (Docs/Office). Or use paste below. / 已用本标签页缓存选中文字。';
+    } else if (
+      tab.url?.includes('docs.google.com') ||
+      tab.url?.includes('office') ||
+      tab.url?.includes('sharepoint')
+    ) {
+      note =
+        'No selection found — Cmd+C your text, open “Docs / Word / Excel online”, paste. / 请复制后粘贴分析。';
     }
   }
-  lastReport = analyzeText(text, { customPhrases });
-  renderReport(lastReport);
-  if (!statusEl.textContent) statusEl.textContent = '';
+  await analyzeAndShow(text, note);
+}
+
+async function runPasted() {
+  const text = document.getElementById('paste').value.replace(/\s+/g, ' ').trim();
+  statusEl.textContent = '';
+  await analyzeAndShow(
+    text,
+    text.length >= 80
+      ? 'Analyzed from paste (nothing sent online). / 已分析粘贴内容。'
+      : 'Paste at least ~80 characters. / 至少需要约 80 字。',
+  );
 }
 
 async function highlightOnPage() {
@@ -178,9 +217,15 @@ async function highlightOnPage() {
   statusEl.textContent = 'Highlighting…';
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
-  if (tab.url?.includes('docs.google.com')) {
+  const u = tab.url || '';
+  if (
+    u.includes('docs.google.com') ||
+    u.includes('officeapps.live.com') ||
+    u.includes('office.com') ||
+    u.includes('sharepoint.com')
+  ) {
     statusEl.textContent =
-      'Highlight not supported in Google Docs — use Copy report or a normal webpage.';
+      'Highlight not supported in Docs/Office online — use Copy report.';
     return;
   }
   await chrome.scripting.executeScript({
@@ -248,6 +293,9 @@ async function highlightOnPage() {
 
 document.getElementById('page').addEventListener('click', () => void runInPage('page'));
 document.getElementById('selection').addEventListener('click', () => void runInPage('selection'));
+document
+  .getElementById('paste-analyze')
+  .addEventListener('click', () => void runPasted());
 highlightBtn.addEventListener('click', () => void highlightOnPage());
 copyBtn.addEventListener('click', async () => {
   if (!pro || !lastReport) return;
