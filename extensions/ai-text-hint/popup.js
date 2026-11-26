@@ -13,6 +13,7 @@ const proBadge = document.getElementById('pro-badge');
 const highlightBtn = document.getElementById('highlight');
 const copyBtn = document.getElementById('copy');
 
+
 async function loadContext() {
   pro = await isProUnlocked();
   proBadge.classList.toggle('hidden', !pro);
@@ -53,7 +54,6 @@ function renderReport(report) {
   const freeLimit = 2;
   const phrases = report.hitPhrases;
   const showPhrases = pro ? phrases : phrases.slice(0, freeLimit);
-  const hiddenCount = pro ? 0 : Math.max(0, phrases.length - freeLimit);
 
   let html = '';
   if (showPhrases.length) {
@@ -78,11 +78,9 @@ function renderReport(report) {
 
   matchesEl.innerHTML = html;
 
-  if (!pro && (hiddenCount > 0 || report.transitionHits.length > 0)) {
-    proCtaEl.textContent = `Pro: full phrase list (${phrases.length}), transitions, highlight on page, copy report, custom blocklist.`;
-    proCtaEl.classList.remove('hidden');
-  } else if (!pro) {
-    proCtaEl.textContent = 'Pro: highlight hits on the page, copy report, custom blocklist.';
+  if (!pro) {
+    proCtaEl.textContent =
+      'Pro: full phrase list, highlight on page, copy report, custom blocklist.';
     proCtaEl.classList.remove('hidden');
   } else {
     proCtaEl.classList.add('hidden');
@@ -102,67 +100,114 @@ function reportPlainText(report) {
     `Slop pattern score: ${report.score}/100 — ${report.band}`,
     report.rhythmTip,
     report.runHint || '',
-    `Words≈${report.words}, sentences ${report.sentenceCount}, avg ${report.avgLen.toFixed(1)}, σ ${report.burstiness.toFixed(1)}`,
+    `Words≈${report.words}, sentences ${report.sentenceCount}`,
     'Phrases: ' + (report.hitPhrases.join('; ') || 'none'),
-    'Transitions: ' + (report.transitionHits.join('; ') || 'none'),
     '',
     'On-device pattern hints — not proof of AI authorship.',
   ];
   return lines.filter(Boolean).join('\n');
 }
 
-async function sessionSelectionForTab(tabId) {
+async function docsCachedSelection(tabId) {
   const { slopCapture } = await chrome.storage.session.get('slopCapture');
   if (!slopCapture || slopCapture.tabId !== tabId) return '';
-  const age = Date.now() - (slopCapture.at || 0);
-  if (age > 300_000) return '';
+  if (Date.now() - (slopCapture.at || 0) > 300_000) return '';
   return slopCapture.text || '';
 }
 
-async function extractFromTab(tabId, mode) {
+function pageExtractFunc(pickMode) {
+  const clean = (s) => s.replace(/\s+/g, ' ').trim();
+  const pickSelectionText = () =>
+    clean(window.getSelection?.()?.toString?.() ?? '').slice(0, 8000);
+  const pickArticleText = () => {
+    const selectors = [
+      '.kix-appview-editor',
+      '.kix-page-content-wrapper',
+      '.WACViewPanel_EditingElement',
+      'article',
+      'main',
+      '[role="article"]',
+    ];
+    for (const sel of selectors) {
+      const t = clean(document.querySelector(sel)?.innerText ?? '');
+      if (t.length > 80) return t.slice(0, 12000);
+    }
+    let best = '';
+    for (const root of [document.body]) {
+      const t = clean(root?.innerText ?? '');
+      if (t.length > best.length) best = t;
+    }
+    return best.slice(0, 12000);
+  };
+  return pickMode === 'selection' ? pickSelectionText() : pickArticleText();
+}
+
+async function runScript(tabId, pickMode, allFrames) {
+  const [{ result }] = await chrome.scripting.executeScript({
+    target: { tabId, allFrames: !!allFrames },
+    world: 'MAIN',
+    func: pageExtractFunc,
+    args: [pickMode],
+  });
+  return result ?? '';
+}
+
+async function extractFromTab(tabId, tabUrl, mode) {
+  if (mode === 'selection') {
+    let text = await runScript(tabId, 'selection', false);
+    if (text.length >= 80) return { text, note: '' };
+
+    const isDocs =
+      tabUrl?.includes('docs.google.com') ||
+      tabUrl?.includes('officeapps.live.com') ||
+      tabUrl?.includes('sharepoint.com');
+
+    if (isDocs) {
+      const cached = await docsCachedSelection(tabId);
+      if (cached.length >= 80) {
+        return {
+          text: cached,
+          note:
+            'Used selection saved before popup (Google Docs). Or paste below. / 已用 Docs 缓存选区。',
+        };
+      }
+      for (const allFrames of [true]) {
+        const results = await chrome.scripting.executeScript({
+          target: { tabId, allFrames },
+          world: 'MAIN',
+          func: pageExtractFunc,
+          args: ['selection'],
+        });
+        for (const row of results) {
+          const t = row?.result ?? '';
+          if (t.length > text.length) text = t;
+        }
+      }
+      if (text.length >= 80) return { text, note: '' };
+      return {
+        text,
+        note:
+          'Google Docs: Cmd+C → expand “Docs / Word / Excel online” → paste. / Docs 请用粘贴分析。',
+      };
+    }
+
+    return { text, note: text.length < 80 ? 'Select at least ~80 characters on the page first.' : '' };
+  }
+
+  const text = await runScript(tabId, 'page', false);
+  if (text.length >= 80) return { text, note: '' };
   const results = await chrome.scripting.executeScript({
     target: { tabId, allFrames: true },
     world: 'MAIN',
-    func: (pickMode) => {
-      const clean = (s) => s.replace(/\s+/g, ' ').trim();
-      const pickSelectionText = () =>
-        clean(window.getSelection?.()?.toString?.() ?? '').slice(0, 8000);
-      const pickArticleText = () => {
-        const selectors = [
-          '.kix-appview-editor',
-          '.kix-page-content-wrapper',
-          '.WACViewPanel_EditingElement',
-          '.PageContent',
-          '[data-automation-id="contentEditableRegion"]',
-          '.od-FieldRenderer-text',
-          'article',
-          'main',
-          '[role="textbox"]',
-        ];
-        for (const sel of selectors) {
-          const el = document.querySelector(sel);
-          const t = clean(el?.innerText ?? '');
-          if (t.length > 80) return t.slice(0, 12000);
-        }
-        let best = '';
-        for (const root of [document.body].filter(Boolean)) {
-          const t = clean(root.innerText ?? '');
-          if (t.length > best.length) best = t;
-        }
-        return best.slice(0, 12000);
-      };
-      const text =
-        pickMode === 'selection' ? pickSelectionText() : pickArticleText();
-      return text;
-    },
-    args: [mode],
+    func: pageExtractFunc,
+    args: ['page'],
   });
-  let best = '';
+  let best = text;
   for (const row of results) {
     const t = row?.result ?? '';
     if (t.length > best.length) best = t;
   }
-  return best;
+  return { text: best, note: '' };
 }
 
 async function analyzeAndShow(text, statusNote) {
@@ -179,30 +224,17 @@ async function runInPage(mode) {
     statusEl.textContent = 'No active tab.';
     return;
   }
-  let text = await extractFromTab(tab.id, mode);
-  let note = '';
-  if (mode === 'selection') {
-    const cached = await sessionSelectionForTab(tab.id);
-    if (cached.length > text.length) text = cached;
-    if (text.length >= 80 && cached.length >= 80 && cached.length >= text.length) {
-      note =
-        'Used your last selection (popup clears highlight). / 已用打开弹窗前选中的文字。';
-    } else if (text.length < 80) {
-      note =
-        'Tip: select text on the page, then open this popup → Analyze selection. Or paste below. / 先选中文字再开弹窗，或用下方粘贴。';
-    }
-  }
+  const { text, note } = await extractFromTab(tab.id, tab.url, mode);
   await analyzeAndShow(text, note);
 }
 
 async function runPasted() {
   const text = document.getElementById('paste').value.replace(/\s+/g, ' ').trim();
-  statusEl.textContent = '';
   await analyzeAndShow(
     text,
     text.length >= 80
-      ? 'Analyzed from paste (nothing sent online). / 已分析粘贴内容。'
-      : 'Paste at least ~80 characters. / 至少需要约 80 字。',
+      ? 'Analyzed from paste. / 已分析粘贴内容。'
+      : 'Paste at least ~80 characters.',
   );
 }
 
@@ -210,20 +242,14 @@ async function highlightOnPage() {
   if (!pro || !lastReport) return;
   const terms = buildHighlightTerms(lastReport);
   if (!terms.length) return;
-  statusEl.textContent = 'Highlighting…';
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
   const u = tab.url || '';
-  if (
-    u.includes('docs.google.com') ||
-    u.includes('officeapps.live.com') ||
-    u.includes('office.com') ||
-    u.includes('sharepoint.com')
-  ) {
-    statusEl.textContent =
-      'Highlight not supported in Docs/Office online — use Copy report.';
+  if (u.includes('docs.google.com') || u.includes('officeapps.live.com')) {
+    statusEl.textContent = 'Highlight not supported in Docs/Office — use Copy report.';
     return;
   }
+  statusEl.textContent = 'Highlighting…';
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     world: 'MAIN',
@@ -232,44 +258,34 @@ async function highlightOnPage() {
       if (!document.getElementById(STYLE_ID)) {
         const st = document.createElement('style');
         st.id = STYLE_ID;
-        st.textContent = 'mark.slop-hl{background:#ffe566;padding:0 1px;border-radius:2px;}';
+        st.textContent = 'mark.slop-hl{background:#ffe566;padding:0 1px;}';
         document.head.appendChild(st);
       }
       document.querySelectorAll('mark.slop-hl').forEach((mark) => {
-        const t = document.createTextNode(mark.textContent);
-        mark.replaceWith(t);
+        mark.replaceWith(document.createTextNode(mark.textContent));
       });
-      const escaped = patterns.map((p) =>
-        p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-      );
+      const escaped = patterns.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       if (!escaped.length) return;
-      const regex = new RegExp(escaped.join('|'), 'gi');
+      const re = new RegExp(escaped.join('|'), 'gi');
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-        acceptNode(node) {
-          const p = node.parentElement;
-          if (!p) return NodeFilter.FILTER_REJECT;
-          if (p.closest('script,style,noscript,textarea,code,mark.slop-hl')) {
-            return NodeFilter.FILTER_REJECT;
-          }
-          return NodeFilter.FILTER_ACCEPT;
+        acceptNode(n) {
+          const p = n.parentElement;
+          return p && !p.closest('script,style,noscript,textarea,code,mark.slop-hl')
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
         },
       });
-      const nodes = [];
-      let n;
-      while ((n = walker.nextNode())) nodes.push(n);
+      let node;
       let count = 0;
-      for (const textNode of nodes) {
-        if (count > 120) break;
-        const text = textNode.textContent;
-        regex.lastIndex = 0;
-        if (!regex.test(text)) continue;
-        regex.lastIndex = 0;
+      while ((node = walker.nextNode()) && count < 120) {
+        const text = node.textContent;
+        re.lastIndex = 0;
+        if (!re.test(text)) continue;
+        re.lastIndex = 0;
         const frag = document.createDocumentFragment();
         let last = 0;
         let m;
-        const re = new RegExp(regex.source, regex.flags);
-        while ((m = re.exec(text)) !== null) {
-          if (count > 120) break;
+        while ((m = re.exec(text)) !== null && count < 120) {
           frag.appendChild(document.createTextNode(text.slice(last, m.index)));
           const mark = document.createElement('mark');
           mark.className = 'slop-hl';
@@ -279,28 +295,25 @@ async function highlightOnPage() {
           count++;
         }
         frag.appendChild(document.createTextNode(text.slice(last)));
-        if (count > 0) textNode.parentNode.replaceChild(frag, textNode);
+        node.parentNode.replaceChild(frag, node);
       }
     },
     args: [terms],
   });
-  statusEl.textContent = 'Highlighted (reload page to clear).';
+  statusEl.textContent = 'Highlighted (reload to clear).';
 }
 
 document.getElementById('page').addEventListener('click', () => void runInPage('page'));
 document.getElementById('selection').addEventListener('click', () => void runInPage('selection'));
-document
-  .getElementById('paste-analyze')
-  .addEventListener('click', () => void runPasted());
+document.getElementById('paste-analyze').addEventListener('click', () => void runPasted());
 highlightBtn.addEventListener('click', () => void highlightOnPage());
 copyBtn.addEventListener('click', async () => {
   if (!pro || !lastReport) return;
-  const text = reportPlainText(lastReport);
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(reportPlainText(lastReport));
     statusEl.textContent = 'Report copied.';
   } catch {
-    statusEl.textContent = 'Copy failed — select from results manually.';
+    statusEl.textContent = 'Copy failed.';
   }
 });
 document.getElementById('open-options').addEventListener('click', (e) => {
