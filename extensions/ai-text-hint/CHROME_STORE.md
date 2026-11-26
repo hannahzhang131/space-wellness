@@ -26,8 +26,8 @@ Support URL:
 
 ```bash
 cd /path/to/space-wellness/extensions/ai-text-hint
-zip -r ../ai-pattern-slop-checker-v0.1.3.zip . \
-  -x "*.DS_Store" -x "CHROME_STORE.md" -x "MONETIZATION.md"
+zip -r ../ai-pattern-slop-checker-v0.2.0.zip . \
+  -x "*.DS_Store" -x "CHROME_STORE.md" -x "MONETIZATION.md" -x "PRO.md" -x "scripts/*"
 ```
 
 Zip root must contain `manifest.json` (not a parent folder only).
@@ -56,22 +56,25 @@ Optional: put files in `extensions/ai-text-hint/store-assets/` (not in zip).
 **Title:** AI Pattern & Slop Checker (Local & Private)
 
 **Short description (132 chars):**  
-Catch templated “slop” patterns in page text—one click. 100% on-device. No account. Your text never leaves the browser.
+Spot AI slop clichés & robotic rhythm on any page—100% on-device. EN + 中文 patterns. Your drafts never upload.
 
 **Detailed description:**
 
 ```
-Read long posts, Reddit threads, or articles without opening another tab.
+Before you publish — check slop patterns without opening ZeroGPT.
 
-AI Pattern & Slop Checker scores text you’re already viewing:
-• Analyze page article (blog / news body)
-• Analyze selection (best for forums—highlight one comment first)
+• Analyze page article or selection (forums: highlight one comment first)
+• Slop pattern score + rhythm (σ) tips — English & Chinese template phrases
+• Free: score, stats, top matched phrases, rhythm coaching
+• Pro (optional lifetime license via support email): full hit lists, highlight on page, copy report, custom blocklist
 
-Everything runs on your device. We do not upload your text to Oceanink or third-party AI APIs.
+100% on-device. No account. Text is not sent to Oceanink or third-party AI APIs.
 
-IMPORTANT: This is a pattern hint tool, not proof of AI or human writing. Low scores are normal. High scores only mean more template-like patterns were found.
+For writers, SEO posts, cover letters, and 自媒体/文书 self-checks before submit.
 
-Permissions: activeTab + scripting—only when you click Analyze on the tab you opened.
+Pattern hints only — not proof of AI or human authorship.
+
+Permissions: activeTab, scripting, storage (license + your custom word list stay on this device only).
 
 Publisher: Oceanink Ltd
 Support: recipeconnects@oceanink.co
@@ -79,7 +82,7 @@ Support: recipeconnects@oceanink.co
 
 **Category:** Productivity (or Utilities)
 
-**Language:** English (+ add Chinese store text later if you want)
+**Language:** English (primary listing); mention 中文 pattern support in description
 
 ---
 
@@ -99,7 +102,7 @@ Do **not** claim “AI detection” or “% AI” in the listing.
 ## 6. Submit
 
 1. https://chrome.google.com/webstore/devconsole  
-2. **New item** → upload `ai-pattern-slop-checker-v0.1.3.zip`  
+2. **New item** → upload `ai-pattern-slop-checker-v0.2.0.zip`  
 3. Fill store listing, privacy URL, icon, screenshot  
 4. **Submit for review** (often 1–7 days for new items; v0.1.3 uses activeTab only, no broad host access)
 
@@ -109,4 +112,4 @@ After approval, save the public store URL for Gumroad / site links.
 
 ## 7. Side hustle (see MONETIZATION.md)
 
-Keep v0.1.3 **free** on the store for installs. Monetize lightly outside the store (tips or a small Pro pack)—details in `MONETIZATION.md`.
+Store ships **free tier**; Pro keys sold manually (see `PRO.md`). No ads. Monetize lightly outside the store (tips or a small Pro pack)—details in `MONETIZATION.md`.

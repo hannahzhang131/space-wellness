@@ -1,6 +1,6 @@
-/* global analyzeText */
+/* global analyzeText, buildHighlightTerms */
 
-const PHRASES = [
+const PHRASES_EN = [
   'it is important to note',
   'in conclusion',
   'in summary',
@@ -31,12 +31,18 @@ const PHRASES = [
   'myriad',
   'embark on',
   'at its core',
+  'underscores',
+  'pivotal',
+  'seamlessly',
+  'in the realm of',
+];
+
+const PHRASES_ZH = [
   '综上所述',
   '值得一提的是',
   '不仅如此',
   '在当今',
   '随着科技的发展',
-  '人工智能',
   '首先',
   '其次',
   '最后',
@@ -44,7 +50,13 @@ const PHRASES = [
   '希望本文',
   '为您提供',
   '深入探讨',
+  '不可或缺的',
+  '显而易见',
+  '人工智能',
 ];
+
+const TRANSITION_RE =
+  /\b(firstly|secondly|thirdly|furthermore|moreover|in addition|in conclusion|lastly|on the other hand)\b|^[一二三四五六七八九十][、．.]/gim;
 
 function countWords(text) {
   const latin = text.match(/[a-zA-Z]+(?:'[a-z]+)?/g) || [];
@@ -59,12 +71,61 @@ function sentences(text) {
     .filter((s) => s.length > 3);
 }
 
-function analyzeText(text) {
-  if (text.length < 80) {
-    return { score: null, lines: ['Need at least ~80 characters of text.'] };
-  }
+function findPhraseHits(text, phrases) {
   const lower = text.toLowerCase();
-  const hitPhrases = PHRASES.filter((p) => lower.includes(p.toLowerCase()));
+  const hits = [];
+  for (const p of phrases) {
+    const needle = p.toLowerCase();
+    if (lower.includes(needle)) hits.push(p);
+  }
+  return [...new Set(hits)];
+}
+
+function findTransitionHits(text) {
+  const hits = [];
+  const re = new RegExp(TRANSITION_RE.source, TRANSITION_RE.flags);
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    hits.push(m[0].trim());
+  }
+  return [...new Set(hits)];
+}
+
+function rhythmRunHint(lengths) {
+  if (lengths.length < 3) return null;
+  let best = 0;
+  let runStart = 0;
+  let i = 0;
+  while (i < lengths.length) {
+    let j = i;
+    const base = lengths[i];
+    while (j < lengths.length && Math.abs(lengths[j] - base) <= 2) j++;
+    const run = j - i;
+    if (run >= 3 && run > best) {
+      best = run;
+      runStart = i + 1;
+    }
+    i = j > i ? j : i + 1;
+  }
+  if (best >= 3) {
+    return `Sentences ${runStart}–${runStart + best - 1} have similar length (robotic rhythm). Merge or split a few. / 第 ${runStart}–${runStart + best - 1} 句长度接近，可适当合并或拆句。`;
+  }
+  return null;
+}
+
+function analyzeText(text, options = {}) {
+  const custom = Array.isArray(options.customPhrases) ? options.customPhrases : [];
+  const allPhrases = [...PHRASES_EN, ...PHRASES_ZH, ...custom];
+  if (text.length < 80) {
+    return {
+      score: null,
+      short: true,
+      lines: ['Need at least ~80 characters. / 至少需要约 80 个字符。'],
+    };
+  }
+  const hitPhrases = findPhraseHits(text, allPhrases);
+  const transitionHits = findTransitionHits(text);
+  const customHits = findPhraseHits(text, custom);
   const sents = sentences(text);
   const words = countWords(text);
   const lengths = sents.map((s) => Math.max(1, countWords(s)));
@@ -79,38 +140,43 @@ function analyzeText(text) {
   const uniformity =
     avgLen > 8 && burstiness < 5 ? 28 : avgLen > 6 && burstiness < 8 ? 14 : 0;
   const listy = (text.match(/^\s*[-*•]\s/mg) || []).length >= 4 ? 10 : 0;
-  const transitions = (
-    text.match(
-      /\b(firstly|secondly|thirdly|in addition|on the other hand|lastly)\b|^[一二三四五六七八九十][、．.]/gm,
-    ) || []
-  ).length;
-  const transitionScore = Math.min(15, transitions * 5);
+  const transitionScore = Math.min(15, transitionHits.length * 5);
   const score = Math.min(92, Math.round(phraseScore + uniformity + listy + transitionScore));
   const band =
     score >= 55
-      ? 'More templated patterns (not proof of AI)'
+      ? 'Heavy template / slop signals'
       : score >= 25
-        ? 'Some templated patterns'
-        : 'Few templated patterns';
+        ? 'Some template signals'
+        : 'Lighter template signals';
 
-  const variety =
-    burstiness >= 7
-      ? 'high (uneven sentences — often looks more “human” in this model)'
-      : burstiness >= 4
-        ? 'medium'
-        : 'low (even sentence lengths — one signal of templated text)';
+  let rhythmTip;
+  if (burstiness < 4 && avgLen > 6) {
+    rhythmTip =
+      'Rhythm σ is low — sentences are very even. Vary length before publishing. / 句式节奏偏齐，发布前可故意长短交错。';
+  } else if (burstiness >= 7) {
+    rhythmTip = 'Rhythm σ is high — uneven sentences (often reads more natural in this model). / 长短句变化较大。';
+  } else {
+    rhythmTip = 'Rhythm σ is medium — mix of short and long sentences. / 句长变化适中。';
+  }
+  const runHint = burstiness < 5 ? rhythmRunHint(lengths) : null;
 
-  const lines = [
-    `Template-pattern score: ${score}/100 — ${band}`,
-    `(Not “% AI”. Low score = few patterns found, not proof a human wrote it.)`,
-    `Words≈${words} | Sentences: ${Math.max(sents.length, lengths.length ? lengths.length : 1)}`,
-    `Avg sentence length: ${avgLen.toFixed(1)} | Variety σ: ${burstiness.toFixed(1)} — ${variety}`,
-    `Breakdown: phrases ${phraseScore} + evenness ${uniformity} + lists ${listy} + transitions ${transitionScore}`,
-    hitPhrases.length
-      ? `Matched patterns: ${hitPhrases.slice(0, 8).join(', ')}${hitPhrases.length > 8 ? '…' : ''}`
-      : 'No listed template phrases matched.',
-    '',
-    'On-device hints only — not an AI classifier.',
-  ];
-  return { score, lines };
+  return {
+    score,
+    band,
+    words,
+    sentenceCount: Math.max(sents.length, 1),
+    avgLen,
+    burstiness,
+    hitPhrases,
+    transitionHits,
+    customHits,
+    rhythmTip,
+    runHint,
+    breakdown: { phraseScore, uniformity, listy, transitionScore },
+    textSnippet: text.slice(0, 500),
+  };
+}
+
+function buildHighlightTerms(report) {
+  return [...report.hitPhrases, ...report.transitionHits].slice(0, 40);
 }

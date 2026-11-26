@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pro settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <h1>Pro — local license</h1>
+  <p class="lead">No Gumroad inside the extension. Enter the key you received (email / invoice).</p>
+  <label for="license">License key</label>
+  <input id="license" type="text" placeholder="SLPC-XXXX-XXXX" autocomplete="off" />
+  <p id="license-status" class="status" role="status"></p>
+  <button type="button" id="save-license" class="primary">Save license</button>
+
+  <hr />
+
+  <h2>Custom blocklist (Pro)</h2>
+  <p class="fine">One phrase per line — English or 中文. Matched like built-in slop patterns.</p>
+  <textarea id="custom" rows="6" placeholder="Moreover&#10;极其重要"></textarea>
+  <button type="button" id="save-custom" class="secondary">Save custom phrases</button>
+  <p id="custom-status" class="status"></p>
+
+  <script src="license.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
