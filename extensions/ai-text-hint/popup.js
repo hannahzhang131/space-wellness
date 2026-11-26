@@ -121,12 +121,21 @@ async function runInPage(mode) {
   }
   const [{ result }] = await chrome.scripting.executeScript({
     target: { tabId: tab.id },
+    world: 'MAIN',
     func: (pickMode) => {
       const pickArticleText = () => {
+        const docEditor = document.querySelector(
+          '.kix-appview-editor, .kix-page-content-wrapper',
+        );
+        if (docEditor) {
+          const t = docEditor.innerText?.replace(/\s+/g, ' ').trim() ?? '';
+          if (t.length > 80) return t.slice(0, 12000);
+        }
         const roots = [
           document.querySelector('article'),
           document.querySelector('main'),
           document.querySelector('[role="article"]'),
+          document.querySelector('[role="textbox"]'),
           document.body,
         ].filter(Boolean);
         let best = '';
@@ -144,10 +153,22 @@ async function runInPage(mode) {
     },
     args: [mode],
   });
-  const text = result ?? '';
+  let text = result ?? '';
+  if (mode === 'selection' && text.length < 80) {
+    const session = await chrome.storage.session.get([
+      'slopLastSelection',
+      'slopLastSelectionAt',
+    ]);
+    const age = Date.now() - (session.slopLastSelectionAt || 0);
+    if (age < 180_000 && (session.slopLastSelection?.length ?? 0) >= 80) {
+      text = session.slopLastSelection;
+      statusEl.textContent =
+        'Used your last selection (Docs keeps selection when popup opens). / 使用了刚才在文档里的选中文字。';
+    }
+  }
   lastReport = analyzeText(text, { customPhrases });
   renderReport(lastReport);
-  statusEl.textContent = '';
+  if (!statusEl.textContent) statusEl.textContent = '';
 }
 
 async function highlightOnPage() {
@@ -157,8 +178,14 @@ async function highlightOnPage() {
   statusEl.textContent = 'Highlighting…';
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
+  if (tab.url?.includes('docs.google.com')) {
+    statusEl.textContent =
+      'Highlight not supported in Google Docs — use Copy report or a normal webpage.';
+    return;
+  }
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
+    world: 'MAIN',
     func: (patterns) => {
       const STYLE_ID = 'slop-checker-hl-style';
       if (!document.getElementById(STYLE_ID)) {
