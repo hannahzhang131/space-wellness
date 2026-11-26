@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Pattern & Slop Checker (Local & Private)",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Spot slop clichés & robotic rhythm on any page—on-device. EN + 中文 patterns. Text never uploads.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -20,14 +20,7 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://docs.google.com/*",
-        "https://*.officeapps.live.com/*",
-        "https://*.office.com/*",
-        "https://word.cloud.microsoft/*",
-        "https://excel.cloud.microsoft/*",
-        "https://*.sharepoint.com/*"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
       "js": ["selection-bridge.js"],
       "run_at": "document_idle",
       "all_frames": true

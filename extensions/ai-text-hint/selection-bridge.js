@@ -1,7 +1,12 @@
 /**
- * Docs/Office online often clear selection when the popup opens, or use iframes.
- * Capture selection per tab (session only, this device).
+ * Opening the popup clears selection on many sites (not only Docs).
+ * Remember last selection per tab in session storage (this device only).
  */
+if (globalThis.__slopSelectionBridge) {
+  // already loaded
+} else {
+  globalThis.__slopSelectionBridge = true;
+
 function captureSelection() {
   const raw = window.getSelection?.()?.toString?.() ?? '';
   const text = raw.replace(/\s+/g, ' ').trim();
@@ -12,3 +17,4 @@ function captureSelection() {
 document.addEventListener('selectionchange', captureSelection);
 document.addEventListener('mouseup', captureSelection);
 document.addEventListener('keyup', captureSelection);
+}

@@ -181,19 +181,15 @@ async function runInPage(mode) {
   }
   let text = await extractFromTab(tab.id, mode);
   let note = '';
-  if (mode === 'selection' && text.length < 80) {
+  if (mode === 'selection') {
     const cached = await sessionSelectionForTab(tab.id);
-    if (cached.length >= 80) {
-      text = cached;
+    if (cached.length > text.length) text = cached;
+    if (text.length >= 80 && cached.length >= 80 && cached.length >= text.length) {
       note =
-        'Used saved selection for this tab (Docs/Office). Or use paste below. / 已用本标签页缓存选中文字。';
-    } else if (
-      tab.url?.includes('docs.google.com') ||
-      tab.url?.includes('office') ||
-      tab.url?.includes('sharepoint')
-    ) {
+        'Used your last selection (popup clears highlight). / 已用打开弹窗前选中的文字。';
+    } else if (text.length < 80) {
       note =
-        'No selection found — Cmd+C your text, open “Docs / Word / Excel online”, paste. / 请复制后粘贴分析。';
+        'Tip: select text on the page, then open this popup → Analyze selection. Or paste below. / 先选中文字再开弹窗，或用下方粘贴。';
     }
   }
   await analyzeAndShow(text, note);
