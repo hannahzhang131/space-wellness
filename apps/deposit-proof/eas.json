@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "production": {
+      "environment": "deposit-proof",
+      "distribution": "store",
+      "autoIncrement": true,
+      "ios": {
+        "simulator": false
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "recipeconnects@oceanink.co",
+        "appleTeamId": "83K95JM2U2",
+        "ascAppId": "6832864365",
+        "appName": "RentProof"
+      }
+    }
+  }
+}
